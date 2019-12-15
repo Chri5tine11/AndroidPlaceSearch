@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.christine.placessearch.Detailpage">
+
+    <item
+        android:id="@+id/menu_twitter"
+        android:enabled="true"
+        android:icon="@drawable/twittershare"
+        android:orderInCategory="90"
+        android:title="icon"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_shoucang"
+        android:enabled="true"
+        android:icon="@drawable/heart_outline_white"
+        android:orderInCategory="90"
+        android:title="icon"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+</menu>

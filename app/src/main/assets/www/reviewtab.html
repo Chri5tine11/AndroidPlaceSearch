@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.22.0/moment.min.js"></script>
+    <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwuwIez8sQvDess1d0kRvDAWr5WXsMcKw&libraries=places"></script>
+
+    <style type="text/css">
+      .table   tr,td {
+        border: 1px solid white;
+    }
+
+    .center-in-center{
+            position: absolute;
+            top: 40%;
+            left: 40%;
+            color: grey;
+        }
+
+    a:link{ text-decoration:none;}
+    a:visited{text-decoration:none;}
+    a:hover{ text-decoration:none;}
+    a:active{ text-decoration:none;}
+    </style>
+
+</head>
+<body>
+
+
+
+
+<script type="text/javascript">
+
+function yelpreq(){
+  document.getElementById('yelpreview').innerHTML='';
+  $.ajax({
+            url: 'http://christine.us-west-1.elasticbeanstalk.com:8000/',
+            //url: 'http://localhost:8000/',
+            dataType: 'json',
+            type: "GET",
+            data: {'name':dtplacename,'address1':address1,'state':yelpstate,'city':yelp_city,'country':yelp_country,'todo':'yelpreq'},
+            success: function (result) {
+               //console.log(result);
+               ypreviewlist=result;
+
+               if(document.getElementById('dropdownmenulist').innerHTML=='Default order'){
+                printdfyp();
+               }else if(document.getElementById('dropdownmenulist').innerHTML=='Highest rating'){
+                printhiyp();
+               }else if(document.getElementById('dropdownmenulist').innerHTML=='Lowest rating'){
+                printloyp();
+              }else if(document.getElementById('dropdownmenulist').innerHTML=='Most recent'){
+                printmryp();
+              }else if(document.getElementById('dropdownmenulist').innerHTML=='Least recent'){
+                printlryp();
+              }//if order
+
+              },
+            error : function() {
+              document.getElementById('processbar').style.display='none';
+                    html_err="";
+                    html_err +="<div align='center' class='center-in-center'>";
+                    html_err +="Fail to get search results.";
+                    html_err +="</div>";
+
+
+                    $("#yelpreview").html(html_err);
+                    return;
+                }
+        });
+
+}//function
+
+
+ </SCRIPT>
+
+<div class="container">
+    <div  id="Reviews">
+        <div class='row'>
+            <div class="btn-group">
+                <button class="btn btn-light btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id='gybutton'>Google reviews</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="javascript:void(0)"  onclick='huangoogle()' id='googlervbutton'>Google reviews</a>
+                    <a class="dropdown-item" href="javascript:void(0)"  onclick='huanyelp();yelpreq();'>Yelp reviews</a>
+                </div><!-- dropdown -->
+            </div><!-- btn-group -->
+            &nbsp;&nbsp;&nbsp;&nbsp;
+
+            <div class="btn-group">
+                <button class="btn btn-light btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id='dropdownmenulist'>Default order</button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="javascript:void(0)" onclick='printdforder();printdfyp();'>Default order</a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick='printhighorder();printhiyp();'>Highest rating</a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick='printloworder();printloyp();'>Lowest rating</a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick='printmrorder();printmryp();'>Most recent</a>
+                    <a class="dropdown-item" href="javascript:void(0)" onclick='printlrorder();printlryp();'>Least recent</a>
+                </div><!-- dropdown -->
+            </div><!-- btn-group -->
+        </div><!-- row for button -->
+        <div style="font-size: 4px">&nbsp;</div>
+        <div id='pinglunqu'>
+            <div id='googlereview'></div>
+            <div id='yelpreview'></div>
+        </div><!-- pinglunqu -->
+
+    </div><!-- review-tab -->
+</div> <!-- container -->
+
+
+
+<script type="text/javascript">
+
+function huanyelp(){
+  document.getElementById('gybutton').innerHTML='Yelp reviews';
+  document.getElementById('googlereview').style.display='none';
+  document.getElementById('yelpreview').style.display='';
+}//function
+
+function huangoogle(){
+  document.getElementById('gybutton').innerHTML='Google reviews';
+  document.getElementById('yelpreview').style.display='none';
+  document.getElementById('googlereview').style.display='';
+
+}//function
+</script>
+
+
+<div id='detailpage'>
+</div>
+
+<script type="text/javascript">
+var placeid=window.xianrv.placeidreview();
+detailinfo(placeid);
+
+  ypreviewlist='';
+
+function detailinfo(placeidid){
+
+var request = {
+  placeId: placeidid
+};
+service = new google.maps.places.PlacesService(detailpage);
+service.getDetails(request, callback);
+
+}//function detailinfo
+
+function callback(place, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    drcount=0;
+    console.log(place);
+     dtplacename= place.hasOwnProperty('name') ? place.name : "";
+     dtaddress= place.hasOwnProperty('formatted_address') ? place.formatted_address : "";
+
+    address1=dtaddress.split(",")[0];
+    //console.log(address1);
+////////////抓取yelpstate:
+    if(place.hasOwnProperty('address_components')){
+      var address_components=place.address_components;
+
+      for(var i=0;i<address_components.length;i++){
+        for(var j=0;j<address_components[i].types.length;j++){
+          if(address_components[i].types[j]=='administrative_area_level_1'){
+            if(address_components[i].hasOwnProperty('short_name')){
+            yelpstate=address_components[i].short_name;
+           }//if has short name
+          }//if = add level 1
+        }//for type.length
+      }//for address_components
+
+      ////////////////抓city
+     for(var i=0;i<address_components.length;i++){
+        for(var j=0;j<address_components[i].types.length;j++){
+          if(address_components[i].types[j]=='locality'){
+            if(address_components[i].hasOwnProperty('short_name')){
+            yelp_city=address_components[i].short_name;
+           }//if has short name
+          }//if = add level 1
+        }//for type.length
+      }//for address_components
+
+    ////////////////抓country
+    for(var i=0;i<address_components.length;i++){
+        for(var j=0;j<address_components[i].types.length;j++){
+          if(address_components[i].types[j]=='country'){
+            if(address_components[i].hasOwnProperty('short_name')){
+            yelp_country=address_components[i].short_name;
+           }//if has short name
+          }//if = add level 1
+        }//for type.length
+      }//for address_components
+
+    }else{
+      address_components='';
+    }//else has add-components
+ //console.log(yelp_country);
+/////////////////////////////////抓取结束
+
+///////////////////////////////////review
+    ////////////////pinglun
+    reviewlist= place.hasOwnProperty('reviews') ? place.reviews : "";
+    //console.log(reviewlist);
+    if(reviewlist!=""){
+      html_dforder='';
+    html_dforder+="<ul class=\"list-unstyled\">";
+       rvlength=Math.min(5,reviewlist.length);
+      for (var j = 0; j<rvlength; j++){
+        if(reviewlist[j].hasOwnProperty("author_url")){
+         html_dforder+="<a href='"+reviewlist[j].author_url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(reviewlist[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=reviewlist[j].profile_photo_url;
+
+              html_dforder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_dforder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_dforder+="<div class=\"media-body\">";
+          if(reviewlist[j].hasOwnProperty("author_name")){
+
+            html_dforder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+reviewlist[j].author_name+"</span></b></div>";
+
+          }else{//if name
+           html_dforder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_dforder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_dforder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(reviewlist[j].hasOwnProperty("time")){
+            var aurvtime=reviewlist[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_dforder+=fmtime;
+          html_dforder+="</div>";//rvtime
+
+
+          if(reviewlist[j].text!=""){
+          html_dforder += "<div style='color:#6E6E6E;font-size:13px'>"+reviewlist[j].text+"</div>";
+          }else{
+          html_dforder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_dforder+="</div>";//media-body
+          html_dforder+="</li></a>";
+          }else{
+              html_dforder+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(reviewlist[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=reviewlist[j].profile_photo_url;
+
+              html_dforder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_dforder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_dforder+="<div class=\"media-body\">";
+          if(reviewlist[j].hasOwnProperty("author_name")){
+
+            html_dforder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+reviewlist[j].author_name+"</span></b></div>";
+
+          }else{//if name
+           html_dforder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_dforder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_dforder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(reviewlist[j].hasOwnProperty("time")){
+            var aurvtime=reviewlist[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_dforder+=fmtime;
+          html_dforder+="</div>";//rvtime
+
+
+          if(reviewlist[j].text!=""){
+          html_dforder += "<div style='color:#6E6E6E;font-size:13px'>"+reviewlist[j].text+"</div>";
+          }else{
+          html_dforder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_dforder+="</div>";//media-body
+          html_dforder+="</li>";
+              }//else if has auntor_url
+      }//for
+     html_dforder+="</ul>";
+    }else{
+        html_dforder='';
+        html_dforder +="<div align='center' class='center-in-center'>";
+        html_dforder +="No reviews.";
+        html_dforder +="</div>";
+    }//else
+
+
+ //////////////////////////////////////////////////////////////////////////////////////
+
+
+    $("#googlereview").html(html_dforder);
+    document.getElementById('googlervbutton').click();
+    document.getElementById('dropdownmenulist').innerHTML='Default order';
+
+
+    ////////////////review 部分改星星
+   if(reviewlist!=""){
+     for(var i=0;i<rvlength;i++){
+       var xxwidth=$("#reviewstar_"+i).width();
+       var rvrating= reviewlist[i].hasOwnProperty('rating') ? reviewlist[i].rating : 0;
+       $("#reviewstar_"+i).width(rvrating/5*xxwidth);
+      }//for
+    }//if
+
+  }//status ok
+}//function callback
+//
+
+</script>
+
+
+<script>
+
+    function printdfyp(){
+    document.getElementById('yelpreview').innerHTML='';
+     document.getElementById('dropdownmenulist').innerHTML='Default order';
+
+      if(ypreviewlist!=""){
+                  html_yp='';
+                  if(ypreviewlist[0].hasOwnProperty("nomatch")){
+                  if(ypreviewlist[0].nomatch=='nomatch'){
+                  html_yp +="<div align='center' class='center-in-center'>";
+                  html_yp +="No reviews.";
+                  html_yp +="</div>";
+                  $("#yelpreview").html(html_yp);
+                  }else{//nomatch
+                  html_err='';
+                  html_err +="<div align='center' class='center-in-center'>";
+                    html_err +="Fail to get search results.";
+                    html_err +="</div>";
+                  $("#yelpreview").html(html_err);
+                  }//else nomatch=
+                  }else{
+                    html_yp+="<ul class=\"list-unstyled\">";
+                    var yprvlength=ypreviewlist.length;
+                    for (var j = 0; j<yprvlength; j++){
+                      if(ypreviewlist[j].hasOwnProperty("url")){
+                    html_yp+="<a href='"+ypreviewlist[j].url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(ypreviewlist[j].hasOwnProperty("user")){
+                        if(ypreviewlist[j].user.hasOwnProperty("image_url")){
+                          var author_photo=ypreviewlist[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(ypreviewlist[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+ypreviewlist[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(ypreviewlist[j].hasOwnProperty("time_created")){
+                      html_yp+=ypreviewlist[j].time_created;
+                     }//if has rvtime
+                     html_yp+="</div>";//rvtime
+
+
+                     if(ypreviewlist[j].hasOwnProperty("text")){
+                      if(ypreviewlist[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+ypreviewlist[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li></a>";
+                      }else{
+                            html_yp+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(ypreviewlist[j].hasOwnProperty("user")){
+                        if(ypreviewlist[j].user.hasOwnProperty("image_url")){
+                          var author_photo=ypreviewlist[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(ypreviewlist[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+ypreviewlist[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(ypreviewlist[j].hasOwnProperty("time_created")){
+                      html_yp+=ypreviewlist[j].time_created;
+                     }//if has rvtime
+                     html_yp+="</div>";//rvtime
+
+
+                     if(ypreviewlist[j].hasOwnProperty("text")){
+                      if(ypreviewlist[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+ypreviewlist[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li>";
+                      }//if has url
+                    }//for j
+                    html_yp+="</ul>";
+                  $("#yelpreview").html(html_yp);
+                  for(var i=0;i<yprvlength;i++){
+                   var xxwidth=$("#ypreviewstar_"+i).width();
+                   var rvrating= ypreviewlist[i].hasOwnProperty('rating') ? ypreviewlist[i].rating : 0;
+                   $("#ypreviewstar_"+i).width(rvrating/5*xxwidth);
+                  }//for
+                }//else if nomatch
+
+              }else{//else ypreview==''
+                html_yp ='';
+                html_yp +="<div align='center' class='center-in-center'>";
+                html_yp +="No reviews.";
+                html_yp +="</div>";
+                $("#yelpreview").html(html_yp);
+                }//else
+        }//function pri df yp
+
+  function printhiyp(){
+     document.getElementById('yelpreview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Highest rating';
+
+    if(ypreviewlist!=""){
+       html_yp='';
+      if(ypreviewlist[0].hasOwnProperty("nomatch")){
+      if(ypreviewlist[0].nomatch=='nomatch'){
+      html_yp +="<div align='center' class='center-in-center'>";
+        html_yp +="No reviews.";
+        html_yp +="</div>";
+      $("#yelpreview").html(html_yp);
+      }else{//nomatch
+      html_err='';
+      html_err +="<div align='center' class='center-in-center'>";
+      html_err +="Fail to get search results.";
+      html_err +="</div>";
+      $("#yelpreview").html(html_err);
+      }//else nomatch=
+      }else{
+      var arr = ypreviewlist.concat();
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value2 - value1;
+       }//function ab
+      }//function compare
+    arr.sort(compare('rating'));
+
+                    html_yp+="<ul class=\"list-unstyled\">";
+                    var yprvlength=arr.length;
+                    for (var j = 0; j<yprvlength; j++){
+                      if(arr[j].hasOwnProperty("url")){
+                    html_yp+="<a href='"+arr[j].url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E;'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li></a>";
+                      }else{
+                             html_yp+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E;'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li>";
+                     }//if has url
+                    }//for j
+                    html_yp+="</ul>";
+                    $("#yelpreview").html(html_yp);
+                    for(var i=0;i<yprvlength;i++){
+                   var xxwidth=$("#ypreviewstar_"+i).width();
+                   var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+                   $("#ypreviewstar_"+i).width(rvrating/5*xxwidth);
+                   }//for
+                  }//else if nomatch
+
+         }else{//else ypreview==''
+          html_yp ='';
+          html_yp +="<div align='center' class='center-in-center'>";
+          html_yp +="No reviews.";
+          html_yp +="</div>";
+          $("#yelpreview").html(html_yp);
+          }//elseif ypreviewlist
+  }//function printhiyp
+
+
+  function printloyp(){
+    document.getElementById('yelpreview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Lowest rating';
+      html_yp='';
+    if(ypreviewlist!=""){
+      if(ypreviewlist[0].hasOwnProperty("nomatch")){
+      if(ypreviewlist[0].nomatch=='nomatch'){
+      html_yp +="<div align='center' class='center-in-center'>";
+        html_yp +="No reviews.";
+        html_yp +="</div>";
+      $("#yelpreview").html(html_yp);
+      }else{//nomatch
+      html_err='';
+      html_err +="<div align='center' class='center-in-center'>";
+      html_err +="Fail to get search results.";
+      html_err +="</div>";
+      $("#yelpreview").html(html_err);
+      }//else nomatch=
+      }else{
+      var arr = ypreviewlist.concat();
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value1 - value2;
+       }//function ab
+     }//function compare
+    arr.sort(compare('rating'));
+
+                    html_yp+="<ul class=\"list-unstyled\">";
+                    var yprvlength=arr.length;
+                    for (var j = 0; j<yprvlength; j++){
+                      if(arr[j].hasOwnProperty("url")){
+                    html_yp+="<a href='"+arr[j].url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li></a>";
+                      }else{
+                             html_yp+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li>";
+                          }//if has url
+                    }//for j
+                    html_yp+="</ul>";
+                    $("#yelpreview").html(html_yp);
+                    for(var i=0;i<yprvlength;i++){
+                   var xxwidth=$("#ypreviewstar_"+i).width();
+                   var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+                   $("#ypreviewstar_"+i).width(rvrating/5*xxwidth);
+                   }//for
+                  }//else if nomatch
+
+        }else{//else ypreview==''
+          html_yp ='';
+          html_yp +="<div align='center' class='center-in-center'>";
+        html_yp +="No reviews.";
+        html_yp +="</div>";
+          $("#yelpreview").html(html_yp);
+          }//elseif ypreviewlist
+  }//function printloyp
+
+  function printmryp(){
+  document.getElementById('yelpreview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Most recent';
+    html_yp='';
+    if(ypreviewlist!=""){
+      if(ypreviewlist[0].hasOwnProperty("nomatch")){
+      if(ypreviewlist[0].nomatch=='nomatch'){
+      html_yp +="<div align='center' class='center-in-center'>";
+        html_yp +="No reviews.";
+        html_yp +="</div>";
+      $("#yelpreview").html(html_yp);
+      }else{//nomatch
+      html_err='';
+      html_err +="<div align='center' class='center-in-center'>";
+      html_err +="Fail to get search results.";
+      html_err +="</div>";
+      $("#yelpreview").html(html_err);
+      }//else nomatch=
+      }else{
+      var arr = ypreviewlist.concat();
+      for(var i=0;i<arr.length;i++){
+      arr[i].time_created=Date.parse(arr[i].time_created);
+      }//for i
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value2 - value1;
+       }//function ab
+     }//function compare
+    arr.sort(compare('time_created'));///////////
+    for(var i=0;i<arr.length;i++){
+     arr[i].time_created=moment(arr[i].time_created).format('YYYY-MM-DD HH:mm:ss');
+      }//for i
+
+                    html_yp+="<ul class=\"list-unstyled\">";
+                    var yprvlength=arr.length;
+                    for (var j = 0; j<yprvlength; j++){
+                      if(arr[j].hasOwnProperty("url")){
+                    html_yp+="<a href='"+arr[j].url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li></a>";
+                      }else{
+                              html_yp+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li>";
+                          }//if has url
+                    }//for j
+                    html_yp+="</ul>";
+                    $("#yelpreview").html(html_yp);
+                    for(var i=0;i<yprvlength;i++){
+                   var xxwidth=$("#ypreviewstar_"+i).width();
+                   var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+                   $("#ypreviewstar_"+i).width(rvrating/5*xxwidth);
+                   }//for
+                  }//else if nomatch
+
+     }else{//else ypreview==''
+      html_yp='';
+      html_yp +="<div align='center' class='center-in-center'>";
+        html_yp +="No reviews.";
+        html_yp +="</div>";
+      $("#yelpreview").html(html_yp);
+      }//else if ypreviewlist
+
+  }//function
+
+  function printlryp(){
+    document.getElementById('yelpreview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Least recent';
+    html_yp='';
+    if(ypreviewlist!=""){
+      if(ypreviewlist[0].hasOwnProperty("nomatch")){
+      if(ypreviewlist[0].nomatch=='nomatch'){
+      html_yp +="<div align='center' class='center-in-center'>";
+        html_yp +="No reviews.";
+        html_yp +="</div>";
+      $("#yelpreview").html(html_yp);
+      }else{//nomatch
+      html_err='';
+      html_err +="<div align='center' class='center-in-center'>";
+      html_err +="Fail to get search results.";
+      html_err +="</div>";
+      $("#yelpreview").html(html_err);
+      }//else nomatch=
+      }else{
+      var arr = ypreviewlist.concat();
+      for(var i=0;i<arr.length;i++){
+      arr[i].time_created=Date.parse(arr[i].time_created);
+      }//for i
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value1 - value2;
+       }//function ab
+     }//function compare
+    arr.sort(compare('time_created'));///////////
+    for(var i=0;i<arr.length;i++){
+     arr[i].time_created=moment(arr[i].time_created).format('YYYY-MM-DD HH:mm:ss');
+      }//for i
+
+                    html_yp+="<ul class=\"list-unstyled\">";
+                    var yprvlength=arr.length;
+                    for (var j = 0; j<yprvlength; j++){
+                      if(arr[j].hasOwnProperty("url")){
+                    html_yp+="<a href='"+arr[j].url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li></a>";
+                      }else{
+                                html_yp+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+                    if(arr[j].hasOwnProperty("user")){
+                        if(arr[j].user.hasOwnProperty("image_url")){
+                          var author_photo=arr[j].user.image_url;
+
+                            html_yp+="<img class=\"align-self-center mr-3 rounded-circle\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+                        }//if has img-url
+                    html_yp+="<div class=\"media-body\">";
+                    if(arr[j].user.hasOwnProperty("name")){
+
+                            html_yp+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].user.name+"</span></b></div>";
+
+                        }//if has user.name
+
+                     }else{
+                        html_yp+="<div class=\"mt-0 mb-1\"></div>";//空name
+                     }//else if has user
+
+                     var reviewstar="ypreviewstar_"+j;
+
+                     html_yp+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+                     html_yp+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+                     if(arr[j].hasOwnProperty("time_created")){
+                      html_yp+=arr[j].time_created;
+                     }//if has rvtime
+
+                     html_yp+="</div>";//rvtime
+
+
+                     if(arr[j].hasOwnProperty("text")){
+                      if(arr[j].text!=''){
+                        html_yp += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+                         }else{
+                            "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                         }//else if text !=''
+                      }else{//else has text pro
+                      html_yp += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+                      }
+                      html_yp+="</div>";//media-body
+                      html_yp+="</li>";
+                          }//if has url
+                    }//for j
+                    html_yp+="</ul>";
+                    $("#yelpreview").html(html_yp);
+                    for(var i=0;i<yprvlength;i++){
+                    var xxwidth=$("#ypreviewstar_"+i).width();
+                    var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+                    $("#ypreviewstar_"+i).width(rvrating/5*xxwidth);
+                   }//for
+                  }//else if nomatch
+
+      }else{//else ypreview==''
+      html_yp='';
+      html_yp +="<div align='center' class='center-in-center'>";
+        html_yp +="No reviews.";
+        html_yp +="</div>";
+      $("#yelpreview").html(html_yp);
+      }//else if ypreviewlist
+  }//function printlryp
+
+
+function printdforder(){
+ document.getElementById('googlereview').innerHTML='';
+ document.getElementById('dropdownmenulist').innerHTML='Default order';
+
+    if(reviewlist!=""){
+        html_dforder='';
+       html_dforder+="<ul class=\"list-unstyled\">";
+       rvlength=Math.min(5,reviewlist.length);
+      for (var j = 0; j<rvlength; j++){
+        if(reviewlist[j].hasOwnProperty("author_url")){
+         html_dforder+="<a href='"+reviewlist[j].author_url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+            if(reviewlist[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=reviewlist[j].profile_photo_url;
+
+              html_dforder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_dforder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_dforder+="<div class=\"media-body\">";
+          if(reviewlist[j].hasOwnProperty("author_name")){
+
+            html_dforder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+reviewlist[j].author_name+"</span></b></div>";
+
+          }else{//if name
+           html_dforder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_dforder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_dforder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(reviewlist[j].hasOwnProperty("time")){
+            var aurvtime=reviewlist[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_dforder+=fmtime;
+          html_dforder+="</div>";//rvtime
+
+
+          if(reviewlist[j].text!=""){
+          html_dforder += "<div style='color:#6E6E6E;font-size:13px'>"+reviewlist[j].text+"</div>";
+          }else{
+          html_dforder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_dforder+="</div>";//media-body
+          html_dforder+="</li></a>";
+          }else{
+              html_dforder+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+            if(reviewlist[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=reviewlist[j].profile_photo_url;
+
+              html_dforder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_dforder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_dforder+="<div class=\"media-body\">";
+          if(reviewlist[j].hasOwnProperty("author_name")){
+
+            html_dforder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+reviewlist[j].author_name+"</span></b></div>";
+
+          }else{//if name
+           html_dforder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_dforder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_dforder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(reviewlist[j].hasOwnProperty("time")){
+            var aurvtime=reviewlist[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_dforder+=fmtime;
+          html_dforder+="</div>";//rvtime
+
+
+          if(reviewlist[j].text!=""){
+          html_dforder += "<div style='color:#6E6E6E;font-size:13px'>"+reviewlist[j].text+"</div>";
+          }else{
+          html_dforder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_dforder+="</div>";//media-body
+          html_dforder+="</li>";
+              }//else if has auntor_url
+      }//for
+     html_dforder+="</ul>";
+    }else{
+        html_dforder='';
+        html_dforder +="<div align='center' class='center-in-center'>";
+        html_dforder+="No reviews.";
+        html_dforder +="</div>";
+    }//else
+
+  $("#googlereview").html(html_dforder);
+
+  if(reviewlist!=""){
+     for(var i=0;i<rvlength;i++){
+       var xxwidth=$("#reviewstar_"+i).width();
+       var rvrating= reviewlist[i].hasOwnProperty('rating') ? reviewlist[i].rating : 0;
+       $("#reviewstar_"+i).width(rvrating/5*xxwidth);
+      }//for
+    }//ifreviewlist
+ }//function printdforder
+
+function printhighorder(){
+ document.getElementById('googlereview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Highest rating';
+
+    if(reviewlist!=""){
+      var arr = reviewlist.concat();
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value2 - value1;
+       }//function ab
+     }//function compare
+    arr.sort(compare('rating'));
+
+    html_hiorder='';
+    html_hiorder+="<ul class=\"list-unstyled\">";
+
+       rvlength=Math.min(5,arr.length);
+      for (var j = 0; j<rvlength; j++){
+        if(arr[j].hasOwnProperty("author_url")){
+         html_hiorder+="<a href='"+arr[j].author_url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_hiorder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_hiorder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_hiorder+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_hiorder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_hiorder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_hiorder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_hiorder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_hiorder+=fmtime;
+          html_hiorder+="</div>";//rvtime
+
+
+          if(arr[j].text!=""){
+          html_hiorder += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_hiorder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_hiorder+="</div>";//media-body
+          html_hiorder+="</li></a>";
+          }else{
+              html_hiorder+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_hiorder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_hiorder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_hiorder+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_hiorder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_hiorder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_hiorder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_hiorder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_hiorder+=fmtime;
+          html_hiorder+="</div>";//rvtime
+
+
+          if(arr[j].text!=""){
+          html_hiorder += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_hiorder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_hiorder+="</div>";//media-body
+          html_hiorder+="</li>";
+              }//else if has auntor_url
+      }//for
+     html_hiorder+="</ul>";
+
+
+  $("#googlereview").html(html_hiorder);/////////////////////////////////////////////////////////
+     for(var i=0;i<rvlength;i++){
+       var xxwidth=$("#reviewstar_"+i).width();
+       var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+       $("#reviewstar_"+i).width(rvrating/5*xxwidth);
+      }//for
+  }else{
+        html_hiorder='';
+        html_hiorder +="<div align='center' class='center-in-center'>";
+        html_hiorder +="No reviews.";
+        html_hiorder +="</div>";
+        $("#googlereview").html(html_hiorder);
+    }//else if list
+}//function
+
+function printloworder(){
+ document.getElementById('googlereview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Lowest rating';
+
+    if(reviewlist!=""){
+      var arr = reviewlist.concat();
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value1 - value2;
+       }//function ab
+     }//function compare
+    arr.sort(compare('rating'));
+    html_loworder='';
+    html_loworder+="<ul class=\"list-unstyled\">";
+
+       rvlength=Math.min(5,arr.length);
+      for (var j = 0; j<rvlength; j++){
+        if(arr[j].hasOwnProperty("author_url")){
+         html_loworder+="<a href='"+arr[j].author_url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_loworder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_loworder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_loworder+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_loworder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_loworder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_loworder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_loworder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_loworder+=fmtime;
+          html_loworder+="</div>";//rvtime
+
+
+          if(arr[j].text!=""){
+          html_loworder += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_loworder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_loworder+="</div>";//media-body
+          html_loworder+="</li></a>";
+          }else{
+              html_loworder+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_loworder+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_loworder+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_loworder+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_loworder+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_loworder+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_loworder+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_loworder+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_loworder+=fmtime;
+          html_loworder+="</div>";//rvtime
+
+
+          if(arr[j].text!=""){
+          html_loworder += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_loworder += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_loworder+="</div>";//media-body
+          html_loworder+="</li>";
+              }//else if has auntor_url
+      }//for
+     html_loworder+="</ul>";
+
+
+  $("#googlereview").html(html_loworder);////////////////////////////////////////////////////////
+     for(var i=0;i<rvlength;i++){
+       var xxwidth=$("#reviewstar_"+i).width();
+       var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+       $("#reviewstar_"+i).width(rvrating/5*xxwidth);
+      }//for
+    }else{
+        html_loworder='';
+        html_loworder +="<div align='center' class='center-in-center'>";
+        html_loworder +="No reviews.";
+        html_loworder +="</div>";
+        $("#googlereview").html(html_loworder);
+    }//else iflist
+
+}//function
+
+function printmrorder(){
+ document.getElementById('googlereview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Most recent';
+
+    if(reviewlist!=""){
+      var arr = reviewlist.concat();
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value2 - value1;
+       }//function ab
+     }//function compare
+    arr.sort(compare('time'));
+
+    html_mr='';
+    html_mr+="<ul class=\"list-unstyled\">";
+
+       rvlength=Math.min(5,arr.length);
+      for (var j = 0; j<rvlength; j++){
+        if(arr[j].hasOwnProperty("author_url")){
+         html_mr+="<a href='"+arr[j].author_url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_mr+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_mr+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_mr+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_mr+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_mr+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_mr+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_mr+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_mr+=fmtime;
+          html_mr+="</div>";//rvtime
+
+
+          if(arr[j].text!=""){
+          html_mr += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_mr += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_mr+="</div>";//media-body
+          html_mr+="</li></a>";
+          }else{
+                html_mr+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_mr+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_mr+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_mr+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_mr+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_mr+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_mr+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_mr+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_mr+=fmtime;
+          html_mr+="</div>";//rvtime
+
+
+          if(arr[j].text!=""){
+          html_mr += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_mr += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_mr+="</div>";//media-body
+          html_mr+="</li>";
+              }//else if has auntor_url
+      }//for
+     html_mr+="</ul>";
+
+  $("#googlereview").html(html_mr);////////////////////////////////////////////////////////
+
+     for(var i=0;i<rvlength;i++){
+       var xxwidth=$("#reviewstar_"+i).width();
+       var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+       $("#reviewstar_"+i).width(rvrating/5*xxwidth);
+      }//for
+
+    }else{
+        html_mr='';
+        html_mr +="<div align='center' class='center-in-center'>";
+        html_mr +="No reviews.";
+        html_mr +="</div>";
+        $("#googlereview").html(html_mr);
+    }//else if list
+}//function
+
+
+function printlrorder(){
+document.getElementById('googlereview').innerHTML='';
+    document.getElementById('dropdownmenulist').innerHTML='Least recent';
+
+    if(reviewlist!=""){
+      var arr = reviewlist.concat();
+      function compare(property){
+        return function(a,b){
+        var value1 = a[property];
+        var value2 = b[property];
+        return value1 - value2;
+       }//function ab
+     }//function compare
+    arr.sort(compare('time'));
+
+    html_lr='';
+    html_lr+="<ul class=\"list-unstyled\">";
+
+       rvlength=Math.min(5,arr.length);
+      for (var j = 0; j<rvlength; j++){
+        if(arr[j].hasOwnProperty("author_url")){
+         html_lr+="<a href='"+arr[j].author_url+"' target=\"_blank\"><li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_lr+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_lr+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_lr+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_lr+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_lr+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_lr+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_lr+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_lr+=fmtime;
+          html_lr+="</div>";//rvtime
+
+          if(arr[j].text!=""){
+          html_lr += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_lr += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_lr+="</div>";//media-body
+          html_lr+="</li></a>";
+          }else{
+                html_lr+="<li class=\"media mt-2\" style='border: solid 1px white'>";
+         if(arr[j].hasOwnProperty("profile_photo_url"))
+            { var author_photo=arr[j].profile_photo_url;
+
+              html_lr+="<img class=\"align-self-center mr-3\" src=\""+author_photo+"\" height=40px width=40px  alt=\"Generic placeholder image\">";
+
+            }else{
+              html_lr+="<img class=\"align-self-center mr-3\"  height=40px width=40px >";
+            }//else has profile_photo/////////////////
+          html_lr+="<div class=\"media-body\">";
+          if(arr[j].hasOwnProperty("author_name")){
+
+            html_lr+="<div><b class=\"mt-0 mb-1\"><span style='color:#04B486'>"+arr[j].author_name+"</span></b></div>";
+
+          }else{//if name
+          html_lr+="<div class=\"mt-0 mb-1\"></div>";//空name
+          }
+
+
+          var reviewstar="reviewstar_"+j;
+
+          html_lr+="<div id='"+reviewstar+"' style='overflow: hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081;'>&#9733&#9733&#9733&#9733&#9733</div></div>";
+
+          html_lr+="<div id='rvtime' style='font-size:13px;color:#6E6E6E'>";
+          if(arr[j].hasOwnProperty("time")){
+            var aurvtime=arr[j].time *1000;
+            var fmtime=moment(aurvtime).format('YYYY-MM-DD HH:mm:ss');
+          }
+          html_lr+=fmtime;
+          html_lr+="</div>";//rvtime
+
+          if(arr[j].text!=""){
+          html_lr += "<div style='color:#6E6E6E;font-size:13px'>"+arr[j].text+"</div>";
+          }else{
+          html_lr += "<div>&nbsp;&nbsp;&nbsp;&nbsp;</div>";
+          }
+          html_lr+="</div>";//media-body
+          html_lr+="</li>";
+              }//else if has auntor_url
+      }//for
+     html_lr+="</ul>";
+
+  $("#googlereview").html(html_lr);////////////////////////////////////////////////////////
+     for(var i=0;i<rvlength;i++){
+       var xxwidth=$("#reviewstar_"+i).width();
+       var rvrating= arr[i].hasOwnProperty('rating') ? arr[i].rating : 0;
+       $("#reviewstar_"+i).width(rvrating/5*xxwidth);
+      }//for
+    }else{
+        html_lr='';
+        html_lr +="<div align='center' class='center-in-center'>";
+        html_lr +="No reviews.";
+        html_lr +="</div>";
+        $("#googlereview").html(html_lr);
+    }//else iflist
+}//functionlrorder
+
+</script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

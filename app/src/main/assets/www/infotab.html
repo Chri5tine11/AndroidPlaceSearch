@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.22.0/moment.min.js"></script>
+    <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwuwIez8sQvDess1d0kRvDAWr5WXsMcKw&libraries=places"></script>
+
+    <style type="text/css">
+
+
+   .table   tr,td {
+        border: 1px solid white;
+    }
+
+    a:link{ color:#FF4081;text-decoration:underline;}
+    a:visited{color:#FF4081;text-decoration:underline;}
+    a:hover{ color:#FF4081;text-decoration:underline;}
+    a:active{ color:#FF4081;text-decoration:underline;}
+
+</style>
+
+</head>
+<body>
+
+
+
+<div class="tab-pane fade show active" id="Info" role="tabpanel" aria-labelledby="Info-tab">
+    <div class="table-responsive-md" id='Infotablebanma'>
+    </div><!-- table-responsive -->
+</div><!-- Info-tab div -->
+
+
+
+<div id='detailpage'>
+</div>
+
+<script type="text/javascript">
+  var placeid=window.xianin.placeidinfo();
+detailinfo(placeid);
+
+
+function detailinfo(placeidid){
+
+var request = {
+  placeId: placeidid
+};
+service = new google.maps.places.PlacesService(detailpage);
+service.getDetails(request, callback);
+
+}//function detailinfo
+
+function callback(place, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    //console.log(place);
+     dtplacename= place.hasOwnProperty('name') ? place.name : "";
+     dtaddress= place.hasOwnProperty('formatted_address') ? place.formatted_address : "";
+     phonenum= place.hasOwnProperty('international_phone_number') ?place.international_phone_number : "";
+    var pricelv=place.hasOwnProperty('price_level') ? place.price_level : "";
+    var pricest='';
+    for(var i=0;i<pricelv;i++){
+      pricest+='$';
+    }//for
+    var rate= place.hasOwnProperty('rating') ? place.rating : 0;
+    var googlepage= place.hasOwnProperty('url') ? place.url : "";
+    website= place.hasOwnProperty('website') ? place.website : "";
+
+///////////////juti xinxi
+    html_detail="";
+    html_detail+="<table class=\"table\" style='border: 0px solid transparent !important;'>";
+    html_detail+="<tbody>";
+    if(dtaddress!=""){
+    html_detail+="<tr><td style='font-size:15px;color:#848484'><strong>Address</strong></td><td style='font-size:15px;'>"+dtaddress+"</td></tr>";}
+    if(phonenum!=""){
+    html_detail+="<tr><td style='font-size:15px;color:#848484'><strong>Phone Number</strong></td><td style='font-size:15px'><a href=\"javascript:void(0)\" onclick='callphone();'>"+phonenum+"</a></td></tr>";}
+    if(pricelv!=""){
+    html_detail+="<tr><td style='font-size:15px;color:#848484'><strong>Price Level</strong></td><td style='font-size:15px'>"+pricest+"</td></tr>";}
+    if(rate!=""){
+    html_detail+="<tr><td style='font-size:15px;color:#848484'><strong>Rating</strong></td><td><div id='ratingstar' class='float-left' style='overflow:hidden;width:108px;'><div style='font-family:Arial;font-size:24px;color:#FF4081'>&#9733&#9733&#9733&#9733&#9733</div></div></td></tr>";
+    }
+    if(googlepage!=""){
+    html_detail+="<tr><td style='font-size:15px;color:#848484'><strong>Google Page</strong></td><td style='font-size:15px'><a href='"+googlepage+"' target='_blank'>"+googlepage+"</a></td></tr>";}
+    if(website!=""){
+    html_detail+="<tr><td style='font-size:15px;color:#848484'><strong>Website</strong></td><td style='font-size:15px'><a href='"+website+"' target='_blank'>"+website+"</a></td></tr>";}
+
+    html_detail+="</tbody></table>";
+
+
+
+     $("#Infotablebanma").html(html_detail);
+
+     if(rate!=""){
+    var wxlength=$("#ratingstar").width();
+    $("#ratingstar").width(rate/5*wxlength);
+    }//if rate
+
+   // window.dianhua.dadianhua(phonenum);
+
+
+
+  }//status ok
+}//function callback
+//
+
+function callphone(){
+   window.dianhua.dadianhua(phonenum);
+   }
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

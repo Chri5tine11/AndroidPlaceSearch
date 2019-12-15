@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.22.0/moment.min.js"></script>
+    <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwuwIez8sQvDess1d0kRvDAWr5WXsMcKw&libraries=places"></script>
+
+    <style type="text/css">
+
+
+
+   .center-in-center{
+            left: 40%;
+            color: grey;
+        }
+
+  #map {
+    height: 300px;
+    width: 100%;
+
+  }
+
+</style>
+
+    <script type="text/JavaScript">
+       function gradeChange(){
+        var objS = document.getElementById("Travelmode");
+        var grade = objS.options[objS.selectedIndex].value;
+        if(grade=='Driving'){
+        var modexz='DRIVING';
+        }else if(grade=='Bicycling'){
+          modexz='BICYCLING';
+        }else if (grade=='Transit'){
+          modexz='DRIVING';
+        }else if(grade=='Walking'){
+          modexz='WALKING';
+        }
+        initMapdir(placelat,placelng,"DRIVING");
+         initMapdir(placelat,placelng,"DRIVING");
+    initMapdir(placelat,placelng,"DRIVING");
+
+        initMapdir(placelat,placelng,modexz);
+       }
+</script>
+</head>
+<body>
+
+
+<div  id="Maptabtab" style='width:90%;padding-left:8%'>
+</div><!-- map-tab div -->
+
+<script type="text/javascript">
+var defaultBounds = new google.maps.LatLngBounds(
+  new google.maps.LatLng(34.0266, -118.2831),
+  new google.maps.LatLng(40.7127753, -74.0059728));
+
+
+var options = {
+  bounds: defaultBounds,
+  types: ['establishment']
+};
+
+
+</script>
+
+<div id='detailpage' style='width:90%;'>
+</div>
+
+<script type="text/javascript">
+   var placeid=window.xiandi.placeiddi();
+detailinfo(placeid);
+
+
+function detailinfo(placeidid){
+
+var request = {
+  placeId: placeidid
+};
+service = new google.maps.places.PlacesService(detailpage);
+service.getDetails(request, callback);
+
+}//function detailinfo
+
+function callback(place, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+dtplacename= place.hasOwnProperty('name') ? place.name : "";
+     dtaddress= place.hasOwnProperty('formatted_address') ? place.formatted_address : "";
+
+/////////////map
+    html_detail='';
+    html_detail+="<div style='font-size: 30px'>&nbsp;</div>";
+    html_detail+="<form id='mapform' class=\"form-group\" >";
+    html_detail+="<div class='row'>";
+    html_detail+="<div class='col-sm-1'>"
+    html_detail+="<label for='from' class='col-form-label' style=\"font-size:13px;color:grey;width:50%\"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;From</span></label>";
+    html_detail+="<input type=\"text\"  name=\"fromfield\" class=\"form-control form-control-sm col-sm-1\" id=\"fromfield\" style='width:100%;border-color:grey' placeholder='Type in the Location'>";
+    html_detail+="</div>";//col-md-1
+
+    html_detail+="<div class='col-sm-1' >";
+    html_detail+="<input type=\"text\"  name=\"tofield\" class=\"form-control form-control-sm\" id=\"tofield\" style='display:none;width:50%'>";
+    html_detail+="</div>"; //col-md-1
+
+    html_detail+="<div class='col-sm-1'>";
+    html_detail+="<label for='TravelMode' class='col-form-label' style=\"font-size:13px;color:grey\"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Travel Mode</span></label>";
+    html_detail+="<div class='form-group row'>";
+    html_detail+="<div class='col-sm-1'>";
+    html_detail+="<select class=\"custom-select form-control-sm col-sm-1\"  id=\"Travelmode\" NAME=\"Travelmode\" style='width:100%;border-color:white' onchange='gradeChange();'>";
+    html_detail+="<option selected>Driving</option>";
+    html_detail+="<option value='Bicycling'>Bicycling</option>";
+    html_detail+="<option value='Transit'>Transit</option>";
+    html_detail+="<option value='Walking'>Walking</option>";
+    html_detail+="</select>";
+    html_detail+="</div>";//col-sm-1
+
+
+    html_detail+="</div>";//from-group row
+    html_detail+="</div>";//col-sm-4
+    html_detail+="</div>";//row div
+    html_detail+="</form>";
+
+    html_detail+="<div id='map'>";
+    html_detail+="</div>";
+
+
+
+    html_detail +="<div id='nodr' align='center' class='center-in-center' style='display:none;width:90%'>";
+    html_detail +="No directions.";
+    html_detail+="</div>";
+
+    $("#Maptabtab").html(html_detail);
+
+
+ //////////////////////////////////////////////////////////////////////////////////////
+
+    placelat=place.geometry.location.lat();
+    placelng=place.geometry.location.lng();
+    initMap(placelat,placelng);
+
+    var inputwo = document.getElementById('fromfield');
+    autocomplete = new google.maps.places.Autocomplete(inputwo, options);
+
+    tolocation='';
+    tolocation=dtplacename+','+dtaddress;
+    document.getElementById('tofield').value=tolocation;
+
+  }//status ok
+}//function callback
+//
+
+</script>
+
+<script>
+
+      function initMapdir(placelat,placelng,modexz) {
+
+        document.getElementById('nodr').style.display='none';
+        var directionsDisplay = new google.maps.DirectionsRenderer;
+        var directionsService = new google.maps.DirectionsService;
+        var mudi =  new google.maps.LatLng(placelat, placelng);
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 14,
+          center: mudi
+        });
+        directionsDisplay.setMap(map);
+
+
+        calculateAndDisplayRoute(directionsService, directionsDisplay,modexz);
+      }
+
+      function calculateAndDisplayRoute(directionsService, directionsDisplay,modexz) {
+
+            var start = document.getElementById('fromfield').value;
+
+        var end = document.getElementById('tofield').value;
+
+        directionsService.route({
+          origin: start,
+          destination: end,
+          travelMode: modexz,
+          provideRouteAlternatives: true,
+        }, function(response, status) {
+          if (status === 'OK') {
+
+            directionsDisplay.setDirections(response);
+          } else {
+
+            document.getElementById('nodr').style.display='';
+
+          }//else
+        });
+      }
+
+
+    function initMap(placelat,placelng) {
+        var uluru = {lat: placelat, lng: placelng};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 14,
+          center: uluru
+        });
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map
+        });
+      } //function
+
+
+
+   </script>
+
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.22.0/moment.min.js"></script>
+    <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwuwIez8sQvDess1d0kRvDAWr5WXsMcKw&libraries=places"></script>
+
+    <style type="text/css">
+
+    </style>
+
+</head>
+<body>
+
+
+
+<div id='detailpage'>
+</div>
+
+<script type="text/javascript">
+  var placeid=window.chuandt.placeiddt();
+  detailinfo(placeid);
+   //alert(placeid);
+
+   website='';
+
+function detailinfo(placeidid){
+
+var request = {
+  placeId: placeidid
+};
+service = new google.maps.places.PlacesService(detailpage);
+service.getDetails(request, callback);
+
+}//function detailinfo
+
+function callback(place, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+     dtplacename= place.hasOwnProperty('name') ? place.name : "";
+     dtaddress= place.hasOwnProperty('formatted_address') ? place.formatted_address : "";
+    website= place.hasOwnProperty('website') ? place.website : "kong";
+    window.huodedizhi.huoqudizhi(dtaddress);
+    window.huodeweb.huoquweb(website);
+
+  }//status ok
+}//function callback
+//
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

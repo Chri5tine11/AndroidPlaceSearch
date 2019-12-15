@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:descendantFocusability="blocksDescendants"
+    >
+
+    <ImageView
+        android:id="@+id/pic"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+         /> <!--加网络icon-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textname"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="name"
+            android:textColor="#424242"
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/textdizhi"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="dizhi"
+            android:textColor="#6E6E6E"
+            android:textSize="15dp" />
+
+        <TextView
+            android:id="@+id/placeid"
+            android:layout_width="300dp"
+            android:layout_height="0dp"
+            android:text="placeid"
+            android:textColor="#6E6E6E"
+            android:textSize="15dp" />
+
+
+    </LinearLayout>
+
+    <!--<ImageView-->
+        <!--android:id="@+id/picm"-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="60dp"-->
+        <!--android:contentDescription="xinxin"-->
+        <!--android:src="@drawable/heart_outline_black" />-->
+    <ImageButton
+        android:id="@+id/picm"
+        android:layout_width="40dp"
+        android:layout_height="60dp"
+        android:contentDescription="xinxin"
+        android:background="#FAFAFA"
+        android:tag="notlike"
+        android:src="@drawable/heart_outline_black" />
+
+</LinearLayout>

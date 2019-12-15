@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.22.0/moment.min.js"></script>
+    <script type="text/javascript" async src="https://platform.twitter.com/widgets.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCwuwIez8sQvDess1d0kRvDAWr5WXsMcKw&libraries=places"></script>
+
+    <style type="text/css">
+
+   @media(min-width: 34em){
+    .card-columns{
+      -webkit-column-count:4;
+       column-count: 4;
+       -moz-column-count:4;
+      }
+    }
+
+    .center-in-center{
+            position: absolute;
+            top: 40%;
+            left: 40%;
+            color: grey;
+        }
+
+</style>
+
+</head>
+<body>
+
+
+<div id="Photos">
+
+</div>
+
+
+
+
+<div id='detailpage'>
+</div>
+
+<script type="text/javascript">
+var placeid=window.xiantu.placeidphoto();
+detailinfo(placeid);
+
+function detailinfo(placeidid){
+
+var request = {
+  placeId: placeidid
+};
+service = new google.maps.places.PlacesService(detailpage);
+service.getDetails(request, callback);
+
+}//function detailinfo
+
+function callback(place, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+    //console.log(place);
+///////photo
+    html_detail='';
+
+   var photos = place.photos;
+        html_c1='';
+        html_c2='';
+        html_c3='';
+        html_c4='';
+      if (!photos) {
+
+        html_detail +="<div align='center' class='center-in-center'>";
+        html_detail +="No photos.";
+        html_detail +="</div>";
+
+      }else{
+      var phlength=photos.length;
+      html_detail +="<div class='container'>";
+      //html_detail +="<div class='card-columns'>";
+        html_detail+="<div class='row'>";
+        html_detail+="<div class='col-md-3' id='column1'></div>";
+        html_detail+="<div class='col-md-3' id='column2'></div>";
+        html_detail+="<div class='col-md-3' id='column3'></div>";
+        html_detail+="<div class='col-md-3' id='column4'></div>";
+
+      for(var i=0;i<phlength;i++){
+        var photourl=photos[i].getUrl({'maxWidth': 500, 'maxHeight': 500});
+        if(i%4==0){
+          html_c1+="<img  src='"+photourl+"' class='img-thumbnail'>";
+        }else if(i%4==1){
+          html_c2+="<img  src='"+photourl+"' class='img-thumbnail'>";
+        }else if(i%4==2){
+          html_c3+="<img  src='"+photourl+"' class='img-thumbnail'>";
+        }else{
+          html_c4+="<img  src='"+photourl+"' class='img-thumbnail'>";
+        }
+        }//for
+        html_detail+="</div>";//row div
+        html_detail +="</div>";//container
+      }//else
+      //console.log(html_detail);
+
+   $("#Photos").html(html_detail);
+   $("#column1").html(html_c1);
+    $("#column2").html(html_c2);
+    $("#column3").html(html_c3);
+    $("#column4").html(html_c4);
+
+
+  }//status ok
+}//function callback
+
+
+</script>
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
